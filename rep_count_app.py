@@ -1,10 +1,7 @@
 import streamlit as st
 import mediapipe as mp
 import cv2
-import numpy as np
-import tempfile
 import time
-from PIL import Image
 
 from angles_calculation import calculate_lm_angle, bicep_curl_counter, overhead_press_counter, lateral_raise_counter
 from helpers import image_resize
@@ -28,9 +25,7 @@ st.markdown(
 )
 
 st.sidebar.title('Settings')
-
-app_mode = st.sidebar.selectbox('Choose the Exercise',
-                                ['Bicep Curl', 'Overhead Press', 'Lateral Raise'])
+app_mode = st.sidebar.selectbox('Choose the Exercise', ['Bicep Curl', 'Overhead Press', 'Lateral Raise'])
 
 if app_mode == 'Bicep Curl':
     drawing_spec = mp_drawing.DrawingSpec(thickness=2, circle_radius=1)
@@ -40,12 +35,16 @@ if app_mode == 'Bicep Curl':
     tracking_confidence = st.sidebar.slider('Min Tracking Confidence', min_value=0.0, max_value=1.0, value=0.5)
     st.sidebar.markdown('---')
 
+    show_angle = st.sidebar.checkbox("Show angles", value=True)
+    show_skeleton = st.sidebar.checkbox("Show skeleton", value=True)
+    st.sidebar.markdown('---')
+
     st.title('Bicep Curl')
     kpi1, kpi2 = st.columns(2)
     stframe = st.empty()
     st.markdown("<hr/>", unsafe_allow_html=True)
 
-    vid = cv2.VideoCapture(0)
+    vid = cv2.VideoCapture(0 + cv2.CAP_DSHOW)
 
     width = int(vid.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(vid.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -87,19 +86,20 @@ if app_mode == 'Bicep Curl':
 
                 # detect bicep curl
                 angle_left_elbow = calculate_lm_angle(image, mp_pose, landmarks, 'LEFT_SHOULDER', 'LEFT_ELBOW'
-                                                      , 'LEFT_WRIST')
+                                                      , 'LEFT_WRIST', show_angle)
                 angle_right_elbow = calculate_lm_angle(image, mp_pose, landmarks, 'RIGHT_SHOULDER', 'RIGHT_ELBOW',
-                                                       'RIGHT_WRIST')
+                                                       'RIGHT_WRIST', show_angle)
                 counter, stage = bicep_curl_counter(counter, stage, angle_left_elbow, angle_right_elbow)
 
             except:
                 pass
 
             # render detections
-            mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_pose.POSE_CONNECTIONS,
-                                      mp_drawing.DrawingSpec(color=(245, 117, 66), thickness=2, circle_radius=2),
-                                      mp_drawing.DrawingSpec(color=(245, 66, 230), thickness=2, circle_radius=2)
-                                      )
+            if show_skeleton:
+                mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_pose.POSE_CONNECTIONS,
+                                          mp_drawing.DrawingSpec(color=(245, 117, 66), thickness=2, circle_radius=2),
+                                          mp_drawing.DrawingSpec(color=(245, 66, 230), thickness=2, circle_radius=2)
+                                          )
 
             # FPS counter logic
             currTime = time.time()
@@ -124,12 +124,16 @@ elif app_mode == 'Overhead Press':
     tracking_confidence = st.sidebar.slider('Min Tracking Confidence', min_value=0.0, max_value=1.0, value=0.5)
     st.sidebar.markdown('---')
 
+    show_angle = st.sidebar.checkbox("Show angles", value=True)
+    show_skeleton = st.sidebar.checkbox("Show skeleton", value=True)
+    st.sidebar.markdown('---')
+
     st.title('Overhead Press')
     kpi1, kpi2 = st.columns(2)
     stframe = st.empty()
     st.markdown("<hr/>", unsafe_allow_html=True)
 
-    vid = cv2.VideoCapture(0)
+    vid = cv2.VideoCapture(0 + cv2.CAP_DSHOW)
 
     width = int(vid.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(vid.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -171,14 +175,14 @@ elif app_mode == 'Overhead Press':
 
                 # detect overhead press
                 angle_left_shoulder = calculate_lm_angle(image, mp_pose, landmarks, 'LEFT_HIP', 'LEFT_SHOULDER',
-                                                         'LEFT_ELBOW')
+                                                         'LEFT_ELBOW', show_angle)
                 angle_right_shoulder = calculate_lm_angle(image, mp_pose, landmarks, 'RIGHT_HIP', 'RIGHT_SHOULDER',
-                                                          'RIGHT_ELBOW')
+                                                          'RIGHT_ELBOW', show_angle)
 
                 angle_left_elbow = calculate_lm_angle(image, mp_pose, landmarks, 'LEFT_SHOULDER', 'LEFT_ELBOW',
-                                                      'LEFT_WRIST')
+                                                      'LEFT_WRIST', show_angle)
                 angle_right_elbow = calculate_lm_angle(image, mp_pose, landmarks, 'RIGHT_SHOULDER', 'RIGHT_ELBOW',
-                                                       'RIGHT_WRIST')
+                                                       'RIGHT_WRIST', show_angle)
 
                 counter, stage = overhead_press_counter(counter, stage, angle_left_shoulder, angle_right_shoulder,
                                                         angle_left_elbow, angle_right_elbow)
@@ -187,10 +191,11 @@ elif app_mode == 'Overhead Press':
                 pass
 
             # render detections
-            mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_pose.POSE_CONNECTIONS,
-                                      mp_drawing.DrawingSpec(color=(245, 117, 66), thickness=2, circle_radius=2),
-                                      mp_drawing.DrawingSpec(color=(245, 66, 230), thickness=2, circle_radius=2)
-                                      )
+            if show_skeleton:
+                mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_pose.POSE_CONNECTIONS,
+                                          mp_drawing.DrawingSpec(color=(245, 117, 66), thickness=2, circle_radius=2),
+                                          mp_drawing.DrawingSpec(color=(245, 66, 230), thickness=2, circle_radius=2)
+                                          )
 
             # FPS counter logic
             currTime = time.time()
@@ -215,12 +220,16 @@ elif app_mode == 'Lateral Raise':
     tracking_confidence = st.sidebar.slider('Min Tracking Confidence', min_value=0.0, max_value=1.0, value=0.5)
     st.sidebar.markdown('---')
 
+    show_angle = st.sidebar.checkbox("Show angles", value=True)
+    show_skeleton = st.sidebar.checkbox("Show skeleton", value=True)
+    st.sidebar.markdown('---')
+
     st.title('Lateral Raise')
     kpi1, kpi2 = st.columns(2)
     stframe = st.empty()
     st.markdown("<hr/>", unsafe_allow_html=True)
 
-    vid = cv2.VideoCapture(0)
+    vid = cv2.VideoCapture(0 + cv2.CAP_DSHOW)
 
     width = int(vid.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(vid.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -262,9 +271,9 @@ elif app_mode == 'Lateral Raise':
 
                 # detect lateral raise
                 angle_left_shoulder = calculate_lm_angle(image, mp_pose, landmarks, 'LEFT_HIP', 'LEFT_SHOULDER',
-                                                         'LEFT_ELBOW')
+                                                         'LEFT_ELBOW', show_angle)
                 angle_right_shoulder = calculate_lm_angle(image, mp_pose, landmarks, 'RIGHT_HIP', 'RIGHT_SHOULDER',
-                                                          'RIGHT_ELBOW')
+                                                          'RIGHT_ELBOW', show_angle)
 
                 counter, stage = lateral_raise_counter(counter, stage, angle_left_shoulder, angle_right_shoulder)
 
@@ -272,10 +281,11 @@ elif app_mode == 'Lateral Raise':
                 pass
 
             # render detections
-            mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_pose.POSE_CONNECTIONS,
-                                      mp_drawing.DrawingSpec(color=(245, 117, 66), thickness=2, circle_radius=2),
-                                      mp_drawing.DrawingSpec(color=(245, 66, 230), thickness=2, circle_radius=2)
-                                      )
+            if show_skeleton:
+                mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_pose.POSE_CONNECTIONS,
+                                          mp_drawing.DrawingSpec(color=(245, 117, 66), thickness=2, circle_radius=2),
+                                          mp_drawing.DrawingSpec(color=(245, 66, 230), thickness=2, circle_radius=2)
+                                          )
 
             # FPS counter logic
             currTime = time.time()
