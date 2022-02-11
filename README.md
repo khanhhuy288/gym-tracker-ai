@@ -25,7 +25,12 @@ pip install -r requirements.txt
 ```
 
 ## Usage
-Stay in front of the webcam so that all the moving joints are visible. The app can currently detect in total 3 different exercises, which are:
+Run the Streamlit app in the browser.
+```
+streamlit run rep_count_app.py
+```
+
+Stay in front of the webcam so that all the involving joints of an exercise are visible. The app can currently detect in total 3 different exercises, which are:
 * Bicep curl 
 
 ![Bicep curl](http://newlife.com.cy/wp-content/uploads/2019/11/23211301-Dumbbell-Standing-Inner-Biceps-Curl-version-2_Upper-Arms_360.gif)
