@@ -27,6 +27,7 @@ st.markdown(
 st.sidebar.title('Settings')
 app_mode = st.sidebar.selectbox('Choose the Exercise', ['Bicep Curl', 'Overhead Press', 'Lateral Raise'])
 
+# tab for tracking bicep curl
 if app_mode == 'Bicep Curl':
     drawing_spec = mp_drawing.DrawingSpec(thickness=2, circle_radius=1)
     st.sidebar.markdown('---')
@@ -69,14 +70,14 @@ if app_mode == 'Bicep Curl':
         while vid.isOpened():
             ret, frame = vid.read()
 
-            # recolor image
+            # recolor image to RGB
             image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             image.flags.writeable = False
 
             # make detection
             results = pose.process(image)
 
-            # recolor back to BGR
+            # recolor image to BGR
             image.flags.writeable = True
             image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
@@ -106,6 +107,7 @@ if app_mode == 'Bicep Curl':
             fps = 1 / (currTime - prevTime)
             prevTime = currTime
 
+            # resize image
             image = cv2.resize(image, (0, 0), fx=0.8, fy=0.8)
             image = image_resize(image=image, width=640)
             stframe.image(image, channels='BGR', use_column_width=True)
@@ -116,6 +118,7 @@ if app_mode == 'Bicep Curl':
 
     vid.release()
 
+# tab to tracking overhead press
 elif app_mode == 'Overhead Press':
     drawing_spec = mp_drawing.DrawingSpec(thickness=2, circle_radius=1)
     st.sidebar.markdown('---')
@@ -202,6 +205,7 @@ elif app_mode == 'Overhead Press':
             fps = 1 / (currTime - prevTime)
             prevTime = currTime
 
+            # resize image
             image = cv2.resize(image, (0, 0), fx=0.8, fy=0.8)
             image = image_resize(image=image, width=640)
             stframe.image(image, channels='BGR', use_column_width=True)
@@ -212,6 +216,7 @@ elif app_mode == 'Overhead Press':
 
     vid.release()
 
+# tab for tracking lateral raise
 elif app_mode == 'Lateral Raise':
     drawing_spec = mp_drawing.DrawingSpec(thickness=2, circle_radius=1)
     st.sidebar.markdown('---')
@@ -292,6 +297,7 @@ elif app_mode == 'Lateral Raise':
             fps = 1 / (currTime - prevTime)
             prevTime = currTime
 
+            # resize image
             image = cv2.resize(image, (0, 0), fx=0.8, fy=0.8)
             image = image_resize(image=image, width=640)
             stframe.image(image, channels='BGR', use_column_width=True)
@@ -301,3 +307,4 @@ elif app_mode == 'Lateral Raise':
             kpi2_text.write(f"<h1 style='text-align: center; color: red;'>{counter}</h1>", unsafe_allow_html=True)
 
     vid.release()
+
